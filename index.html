@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="Kinova Gen3 Lite robot playing beer pong using ROS 2, MoveIt 2, and RealSense-based perception."
+    content="Kinova Gen3 Lite robot playing beer pong using ROS 2, MoveIt 2."
   />
   <style>
     :root {
@@ -458,7 +458,6 @@
       <nav>
         <a href="#overview">Overview</a>
         <a href="#design">System Design</a>
-        <a href="#perception">Perception</a>
         <a href="#results" class="primary">Results</a>
         <a href="#video">Demo</a>
       </nav>
@@ -617,51 +616,6 @@
         </div>
       </section>
 
-      <!-- PERCEPTION / CUP DETECTION -->
-      <section id="perception">
-        <div class="section-header">
-          <h3>Perception & Cup Detection</h3>
-          <span>RealSense-based red cup localization</span>
-        </div>
-
-        <p>
-          A dedicated vision node uses an Intel RealSense RGB-D camera to detect the
-          red cup and compute its yaw angle relative to the camera frame. The color
-          image is converted to HSV, thresholded with two red masks, and the largest
-          contour is used as the cup region. Depth at the contour centroid is
-          combined with camera intrinsics to deproject to 3D and compute a yaw
-          angle using <code>atan2(-X, Z)</code>. This angle is published on the
-          <code>camera_start_angle_deg</code> topic and drives the robot’s base
-          alignment.
-        </p>
-
-        <div class="two-col" style="margin-top:12px;">
-          <div>
-            <div class="tag-label">Cup centered in view</div>
-            <div class="hero-media-inner" style="border-radius:14px; overflow:hidden;">
-              <img src="images/cup_center.jpeg"
-                   alt="Cup detection with cup centered in the workspace"
-                   style="width:100%; display:block;" />
-            </div>
-          </div>
-          <div>
-            <div class="tag-label">Cup shifted to the right</div>
-            <div class="hero-media-inner" style="border-radius:14px; overflow:hidden;">
-              <img src="images/cup_right.jpeg"
-                   alt="Cup detection with cup on the right side of the table"
-                   style="width:100%; display:block;" />
-            </div>
-          </div>
-        </div>
-
-        <p class="footnote">
-          The green bounding box highlights the detected cup, and the overlay
-          shows the estimated (X, Y, Z) position and yaw angle. These coordinates
-          provide the starting yaw for the throwing trajectory and help verify
-          detection quality.
-        </p>
-      </section>
-
       <!-- TECHNICAL DETAILS -->
       <section id="technical">
         <div class="section-header">
@@ -700,12 +654,11 @@
             <p>
               Major challenges included tuning joint velocities and release timing
               on a manipulator not designed for high-speed ballistic motions,
-              debugging TF frames and topic timing during perception–planning
-              integration, and managing asynchronous events. Future extensions
-              include adding a more accurate aerodynamic model of the ball,
-              predicting landing points before execution, and automatically
-              generating optimized throwing trajectories for arbitrary cup
-              positions.
+              debugging TF frames and topic timing during planning integration,
+              and managing asynchronous events. Future extensions include 
+              adding a more accurate aerodynamic model of the ball, predicting 
+              landing points before execution, and automatically generating
+              optimized throwing trajectories for arbitrary cup positions.
             </p>
           </div>
         </div>
@@ -772,8 +725,8 @@
               </li>
               <li>
                 The modular ROS&nbsp;2 structure (separate nodes for throwing,
-                perception, and gripper logic) made it easier to debug integration
-                issues and iterate on the behavior.
+                and gripper logic) made it easier to debug integration issues
+                and iterate on the behavior.
               </li>
               <li>
                 Systematic parameter sweeps and controlled experiments were essential

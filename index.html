@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Beer Pong Robot Arm | Robotics Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Robot arm playing beer pong - final project for Intro to Robotics."
+  />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-alt: #0b1020;
+      --card: #111827;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.21);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 50%, #000 100%);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 14px 18px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      backdrop-filter: blur(22px);
+      position: sticky;
+      top: 16px;
+      z-index: 10;
+      box-shadow: 0 10px 35px rgba(15, 23, 42, 0.6);
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    header span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    nav a {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    nav a:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--text);
+      text-decoration: none;
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    nav a.primary {
+      border-color: rgba(56, 189, 248, 0.7);
+      background: radial-gradient(circle at top left, #0ea5e9, #0369a1);
+      color: #e0f2fe;
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.45);
+    }
+
+    nav a.primary:hover {
+      background: radial-gradient(circle at top left, #38bdf8, #0284c7);
+    }
+
+    main {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+      gap: 22px;
+      align-items: center;
+    }
+
+    .hero-text h2 {
+      font-size: 32px;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .hero-text h2 span {
+      color: var(--accent);
+    }
+
+    .subheading {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .hero-text p {
+      font-size: 14px;
+      color: #d1d5db;
+      max-width: 600px;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.85);
+      color: #e5e7eb;
+    }
+
+    .badge.accent {
+      border-color: rgba(56, 189, 248, 0.7);
+      background: var(--accent-soft);
+      color: #e0f2fe;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: rgba(15, 23, 42, 1);
+      text-decoration: none;
+    }
+
+    .btn.primary {
+      border-color: rgba(56, 189, 248, 0.8);
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      color: #eff6ff;
+      box-shadow: 0 16px 40px rgba(59, 130, 246, 0.6);
+    }
+
+    .btn.primary:hover {
+      background: linear-gradient(135deg, #38bdf8, #4f46e5);
+    }
+
+    .btn.secondary {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .hero-media {
+      border-radius: var(--radius-xl);
+      padding: 14px;
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-media-inner {
+      border-radius: 16px;
+      border: 1px solid rgba(75, 85, 99, 0.7);
+      background: #020617;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-media-inner p {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 0 16px;
+      text-align: center;
+    }
+
+    .video-pill {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      padding: 5px 10px;
+      font-size: 11px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: #e5e7eb;
+    }
+
+    .corner-tag {
+      position: absolute;
+      right: -30px;
+      bottom: 12px;
+      transform: rotate(-10deg);
+      padding: 4px 18px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a5b4fc;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px dashed rgba(129, 140, 248, 0.7);
+    }
+
+    section {
+      border-radius: var(--radius-xl);
+      padding: 18px 18px 20px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 45px rgba(15, 23, 42, 0.85);
+    }
+
+    section + section {
+      margin-top: 6px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section-header span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .section p {
+      font-size: 13px;
+      color: #d1d5db;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      font-size: 13px;
+      color: #d1d5db;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 8px;
+    }
+
+    li::before {
+      content: "•";
+      color: var(--accent);
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.88);
+      color: #e5e7eb;
+    }
+
+    .pill.highlight {
+      border-color: rgba(56, 189, 248, 0.9);
+      background: var(--accent-soft);
+      color: #e0f2fe;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .card {
+      border-radius: 16px;
+      padding: 12px 12px 14px;
+      background: #020617;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .card h4 {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .tag-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .diagram-box {
+      border-radius: 16px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      padding: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(2, 6, 23, 0.9);
+    }
+
+    .diagram-box strong {
+      color: var(--accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    td {
+      color: #d1d5db;
+    }
+
+    .footnote {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    footer {
+      margin-top: 20px;
+      padding: 10px 4px 0;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    footer span {
+      color: var(--accent);
+    }
+
+    @media (max-width: 900px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 18px;
+      }
+
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero-media {
+        order: -1;
+      }
+
+      .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding: 20px 14px 40px;
+      }
+
+      header {
+        position: static;
+      }
+
+      .hero-text h2 {
+        font-size: 24px;
+      }
+
+      .two-col {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .card-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      section {
+        padding: 14px 14px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>Arnav Mahale</h1>
+        <span>Beer Pong Robot Arm · Intro to Robotics Final Project</span>
+      </div>
+      <nav>
+        <a href="#overview">Overview</a>
+        <a href="#design">System Design</a>
+        <a href="#results">Results</a>
+        <a href="#video" class="primary">Demo</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="hero" id="top">
+        <div class="hero-text">
+          <div class="subheading">Intro to Robotics · Fall 2025</div>
+          <h2>
+            Robot Arm <span>Playing Beer Pong</span>
+          </h2>
+          <p>
+            For my final project, I built and programmed a robotic beer pong player:
+            a robot arm that aims, throws, and scores shots into cups using
+            kinematics, motion planning, and empirical trajectory tuning.
+            This page documents the full pipeline from concept to implementation.
+          </p>
+
+          <div class="hero-badges">
+            <div class="badge accent">Manipulation & Trajectory Control</div>
+            <div class="badge">Forward & Inverse Kinematics</div>
+            <div class="badge">Trajectory Tuning & Calibration</div>
+            <div class="badge">Python · (ROS/Simulation if used)</div>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#video" class="btn primary">▶ Watch Demo</a>
+            <a href="#design" class="btn secondary">View System Design</a>
+            <!-- TODO: replace '#' with your report or GitHub link -->
+            <a href="#" class="btn secondary">View Code / Report</a>
+          </div>
+        </div>
+
+        <div class="hero-media" id="video">
+          <div class="video-pill">Demo Video Placeholder</div>
+          <div class="hero-media-inner">
+            <!-- TODO: Replace this with an embedded <video> or <img> frame if you like -->
+            <p>
+              Embed your demo here. For example:
+              <br /><br />
+              – A screenshot/GIF of the robot throwing the ball<br />
+              – Or a link/thumbnail to your YouTube demo.
+              <br /><br />
+              Replace this placeholder with an
+              <code>&lt;img&gt;</code> or <code>&lt;video&gt;</code> tag.
+            </p>
+          </div>
+          <div class="corner-tag">Final Project</div>
+        </div>
+      </section>
+
+      <!-- OVERVIEW -->
+      <section id="overview">
+        <div class="section-header">
+          <h3>Project Overview</h3>
+          <span>Problem, goals, and core idea</span>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <p>
+              The goal of this project was to design and control a robot arm that can
+              play a simplified version of beer pong: repeatedly tossing a ping pong
+              ball from a fixed start position into one or more cups placed on a
+              table at a known distance.
+            </p>
+            <p>
+              I focused on modeling the throwing motion of the end-effector, mapping
+              desired launch velocities to joint trajectories, and iteratively
+              calibrating the throws to improve accuracy.
+            </p>
+            <ul>
+              <li>Modeled the arm and end-effector pose for a throwing motion.</li>
+              <li>Implemented forward/inverse kinematics to generate joint targets.</li>
+              <li>Designed a parameterized throwing trajectory (angle, speed, timing).</li>
+              <li>Empirically tuned parameters to maximize shot consistency.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="tag-label">Setup</div>
+            <ul>
+              <li>Robot arm: <!-- TODO: e.g. "6-DOF XYZ brand arm" or "simulated arm in XYZ" --></li>
+              <li>Environment: ball start position fixed; cup(s) at known pose.</li>
+              <li>Control: position / velocity control via <!-- TODO: fill in control interface -->.</li>
+            </ul>
+            <div class="tag-label" style="margin-top:8px;">Key learning outcomes</div>
+            <div class="pill-row">
+              <span class="pill highlight">Connecting theory to physical behavior</span>
+              <span class="pill">Tradeoffs: precision vs. repeatability</span>
+              <span class="pill">Practical trajectory tuning</span>
+              <span class="pill">Experimental design & data collection</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SYSTEM DESIGN -->
+      <section id="design">
+        <div class="section-header">
+          <h3>System Design</h3>
+          <span>Hardware, software, and control pipeline</span>
+        </div>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4>Hardware</h4>
+            <p>
+              <!-- TODO: customize to your setup -->
+              • Robot arm (DOF, reach, payload)<br />
+              • End-effector / gripper or ball holder<br />
+              • Fixed table and cup layout<br />
+              • Measuring tools for distance/height
+            </p>
+          </div>
+          <div class="card">
+            <h4>Software & Modeling</h4>
+            <p>
+              • Kinematic model of the arm (DH or given model)<br />
+              • Forward/inverse kinematics implementation<br />
+              • Trajectory generator for throwing motion<br />
+              • (Optional) Simulation or plotting for trajectory preview
+            </p>
+          </div>
+          <div class="card">
+            <h4>Control Logic</h4>
+            <p>
+              • Move to pre-throw configuration<br />
+              • Execute time-parameterized throw<br />
+              • Return to home / ready pose<br />
+              • Log outcome (hit/miss) for tuning
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;" class="two-col">
+          <div>
+            <div class="tag-label">Control pipeline</div>
+            <ul>
+              <li>Define target cup position in world or table frame.</li>
+              <li>Choose a desired release pose and velocity for the end-effector.</li>
+              <li>Use kinematics to compute joint positions over time.</li>
+              <li>Send trajectory to the arm controller with correct timing.</li>
+              <li>Observe outcome and adjust throwing parameters.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="tag-label">System diagram (concept)</div>
+            <div class="diagram-box">
+              <strong>High-level blocks:</strong>
+              <br /><br />
+              User-defined cup position → Trajectory Planner
+              (release angle, speed, timing) → Inverse Kinematics → Joint Trajectory
+              → Robot Arm → Ball Flight → Cup / Table
+              <br /><br />
+              You can replace this box with your own diagram image later if you prefer.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TECHNICAL DETAILS -->
+      <section id="technical">
+        <div class="section-header">
+          <h3>Technical Details</h3>
+          <span>Kinematics, trajectory design, and tuning</span>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="tag-label">Kinematics & Poses</div>
+            <p>
+              I used the arm’s kinematic model to compute joint angles that achieve
+              a desired release pose for the end-effector (position and orientation)
+              relative to the table. This ensured the ball started from the correct
+              location and direction before being released.
+            </p>
+            <ul>
+              <li>Defined a pre-throw pose and a release pose in 3D space.</li>
+              <li>
+                Solved inverse kinematics to get joint configurations for these poses.
+              </li>
+              <li>
+                Ensured joint limits and feasible motion between the two states.
+              </li>
+            </ul>
+            <p>
+              The throw is modeled as a fast motion between these poses, with timing
+              chosen to create the right end-effector velocity at release.
+            </p>
+          </div>
+          <div>
+            <div class="tag-label">Throw Parameterization & Tuning</div>
+            <p>
+              Instead of analytically solving the full ballistics problem with perfect
+              dynamics, I used a parameterized throw and tuned it experimentally.
+            </p>
+            <ul>
+              <li>Launch angle and direction of the end-effector.</li>
+              <li>Speed of the motion (duration of the throw segment).</li>
+              <li>Exact release timing / joint velocity profile.</li>
+            </ul>
+            <p>
+              By logging the hit/miss outcomes for different parameter sets, I
+              iteratively improved consistency and accuracy toward a reliable shot.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section id="results">
+        <div class="section-header">
+          <h3>Experiments & Results</h3>
+          <span>Shot accuracy and observations</span>
+        </div>
+
+        <p>
+          I evaluated the performance of the beer pong robot by running repeated
+          trials with fixed cup positions and throwing parameters, then adjusting
+          the parameters to see how accuracy changed.
+        </p>
+
+        <div class="two-col">
+          <div>
+            <div class="tag-label">Example experiment</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Experiment</th>
+                  <th>Cup Distance</th>
+                  <th>Shots</th>
+                  <th>Hits</th>
+                  <th>Hit Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- TODO: Replace these with your actual numbers -->
+                <tr>
+                  <td>Baseline</td>
+                  <td>1.5 m</td>
+                  <td>20</td>
+                  <td>6</td>
+                  <td>30%</td>
+                </tr>
+                <tr>
+                  <td>After tuning</td>
+                  <td>1.5 m</td>
+                  <td>20</td>
+                  <td>12</td>
+                  <td>60%</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="footnote">
+              *Replace the table values with your actual trial counts and hit rates.
+            </p>
+          </div>
+          <div>
+            <div class="tag-label">Key observations</div>
+            <ul>
+              <li>
+                Small changes in release timing or angle had a large effect on where
+                the ball landed.
+              </li>
+              <li>
+                Once tuned, the robot was much more repeatable than a human throw,
+                but sensitive to small position changes of the cup or table.
+              </li>
+              <li>
+                Modeling physics is helpful, but real-world testing is essential to
+                capture friction, compliance, and arm dynamics.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROLE / REFLECTION -->
+      <section id="reflection">
+        <div class="section-header">
+          <h3>My Role & Takeaways</h3>
+          <span>What I built and what I learned</span>
+        </div>
+
+        <p>
+          I worked individually on this project and was responsible for the full
+          pipeline: defining the problem, implementing the kinematics and control
+          logic, tuning the throwing motion, and designing the experiments.
+        </p>
+        <ul>
+          <li>
+            Gained hands-on intuition for how kinematics and motion planning connect
+            to physical behavior.
+          </li>
+          <li>
+            Experienced the gap between ideal models and real hardware dynamics,
+            especially at high speeds.
+          </li>
+          <li>
+            Practiced designing controlled experiments and using data to improve
+            performance.
+          </li>
+        </ul>
+        <p style="margin-top:6px;">
+          If I had more time, I would extend this work with automatic parameter
+          search (e.g., optimization or reinforcement learning) and add perception
+          so the robot can detect cup positions instead of relying on a fixed setup.
+        </p>
+      </section>
+
+      <footer>
+        <div>
+          Beer Pong Robot Arm · Intro to Robotics Final Project ·
+          <span>Arnav Mahale</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

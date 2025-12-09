@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="Robot arm playing beer pong - final project for Intro to Robotics."
+    content="Kinova Gen3 Lite robot playing beer pong using ROS 2, MoveIt 2, and RealSense-based perception."
   />
   <style>
     :root {
@@ -459,8 +459,8 @@
         <a href="#overview">Overview</a>
         <a href="#design">System Design</a>
         <a href="#perception">Perception</a>
-        <a href="#results">Results</a>
-        <a href="#video" class="primary">Demo</a>
+        <a href="#results" class="primary">Results</a>
+        <a href="#video">Demo</a>
       </nav>
     </header>
 
@@ -473,17 +473,18 @@
             Robot Arm <span>Playing Beer Pong</span>
           </h2>
           <p>
-            For our final project, my team and I built and programmed a robotic beer
-            pong player: a robot arm that aims, throws, and scores shots into cups
-            using kinematics, motion planning, and empirical trajectory tuning.
-            This page documents the full pipeline from concept to implementation.
+            For our final project, my team and I built <em>KinoVaPong</em>: a Kinova Gen3
+            Lite manipulator that can autonomously play a game of beer pong. Using
+            ROS&nbsp;2, MoveIt&nbsp;2, and a RealSense RGB-D camera, the robot picks up a
+            ping-pong ball from a known location and executes a fast, human-like throwing
+            motion that lands the ball in a fixed red cup on a distant table.
           </p>
 
           <div class="hero-badges">
             <div class="badge accent">Manipulation & Trajectory Control</div>
             <div class="badge">Forward & Inverse Kinematics</div>
-            <div class="badge">Trajectory Tuning & Calibration</div>
-            <div class="badge">Python · (ROS/Simulation if used)</div>
+            <div class="badge">Vision-guided Yaw Alignment</div>
+            <div class="badge">Python · ROS 2 · MoveIt 2</div>
           </div>
         </div>
 
@@ -503,45 +504,41 @@
       <section id="overview">
         <div class="section-header">
           <h3>Project Overview</h3>
-          <span>Problem, goals, and core idea</span>
+          <span>High-level behavior and goals</span>
         </div>
 
         <div class="two-col">
           <div>
             <p>
-              The goal of this project was to design and control a robot arm that can
-              play a simplified version of beer pong: repeatedly tossing a ping pong
-              ball from a fixed start position into one or more cups placed on a
-              table at a known distance.
+              The robot’s job is to autonomously perform a full beer-pong throw:
+              pick up a ball from a designated pickup spot, lift to a safe height,
+              rotate toward the detected cup, and execute a dynamic swing that
+              releases the ball in mid-air toward the target. The cup is kept at a
+              fixed position on a “beer pong” table, while the robot operates on a
+              separate table with a known ball start pose. :contentReference[oaicite:0]{index=0}
             </p>
             <p>
-              Our team focused on modeling the throwing motion of the end-effector,
-              mapping desired launch velocities to joint trajectories, and
-              iteratively calibrating the throws to improve accuracy. I particularly
-              focused on connecting the kinematics and tuning process to the
-              physical behavior we observed in the lab.
+              Our ROS&nbsp;2 package implements a <code>BeerPongThrow</code> node that
+              orchestrates the pick–lift–throw sequence and connects to MoveIt&nbsp;2
+              for motion planning on the Kinova Gen3 Lite. A separate
+              <code>RedCupAnglePublisher</code> node uses an Intel RealSense camera to
+              detect the red cup and compute its yaw angle; this angle is fed into
+              the throwing node so the robot can align its base joint before the
+              swing. :contentReference[oaicite:1]{index=1}
             </p>
-            <ul>
-              <li>Modeled the arm and end-effector pose for a throwing motion.</li>
-              <li>Implemented forward/inverse kinematics to generate joint targets.</li>
-              <li>Designed a parameterized throwing trajectory (angle, speed, timing).</li>
-              <li>Empirically tuned parameters to maximize shot consistency.</li>
-            </ul>
           </div>
           <div>
-            <div class="tag-label">Setup</div>
+            <div class="tag-label">Setup & human role</div>
             <ul>
-              <li>Robot arm: <!-- TODO: e.g. "6-DOF XYZ brand arm" or "simulated arm in XYZ" --></li>
-              <li>Environment: ball start position fixed; cup(s) at known pose.</li>
-              <li>Control: position / velocity control via <!-- TODO: fill in control interface -->.</li>
+              <li>Kinova Gen3 Lite arm with 2F gripper, on a lab table.</li>
+              <li>Single red cup on a distant marked location on the target table.</li>
+              <li>Ping-pong ball placed at a fixed pickup location within the arm’s reach.</li>
+              <li>
+                Human operator starts ROS&nbsp;2 nodes, supervises throws, and resets
+                the ball and cups between trials while staying outside the robot’s
+                workspace for safety. :contentReference[oaicite:2]{index=2}
+              </li>
             </ul>
-            <div class="tag-label" style="margin-top:8px;">Key learning outcomes</div>
-            <div class="pill-row">
-              <span class="pill highlight">Connecting theory to physical behavior</span>
-              <span class="pill">Tradeoffs: precision vs. repeatability</span>
-              <span class="pill">Practical trajectory tuning</span>
-              <span class="pill">Experimental design & data collection</span>
-            </div>
           </div>
         </div>
       </section>
@@ -557,29 +554,29 @@
           <div class="card">
             <h4>Hardware</h4>
             <p>
-              <!-- TODO: customize to your setup -->
-              • Robot arm (DOF, reach, payload)<br />
-              • End-effector / gripper or ball holder<br />
-              • Fixed table and cup layout<br />
-              • Measuring tools for distance/height
+              • Kinova Gen3 Lite 6-DOF manipulator<br />
+              • Kinova 2F gripper for grasping the ball<br />
+              • Intel RealSense RGB-D camera overlooking both tables<br />
+              • Fixed tables with marked ball pickup and cup locations :contentReference[oaicite:3]{index=3}
             </p>
           </div>
           <div class="card">
-            <h4>Software & Modeling</h4>
+            <h4>Software & Nodes</h4>
             <p>
-              • Kinematic model of the arm (DH or given model)<br />
-              • Forward/inverse kinematics implementation<br />
-              • Trajectory generator for throwing motion<br />
-              • (Optional) Simulation or plotting for trajectory preview
+              • ROS&nbsp;2 nodes <code>BeerPongThrow</code> and <code>RedCupAnglePublisher</code><br />
+              • MoveIt&nbsp;2 motion planning with Kinova URDF/SRDF<br />
+              • Planning scene with the ball as an attachable collision object<br />
+              • Multi-threaded ROS&nbsp;2 executor for concurrent motion and sensing :contentReference[oaicite:4]{index=4}
             </p>
           </div>
           <div class="card">
             <h4>Control Logic</h4>
             <p>
-              • Move to pre-throw configuration<br />
-              • Execute time-parameterized throw<br />
-              • Return to home / ready pose<br />
-              • Log outcome (hit/miss) for tuning
+              • Pick–lift–throw sequence implemented in <code>throw_ball_forward()</code><br />
+              • Angle-based release monitor on <code>joint_3</code> at 100&nbsp;Hz<br />
+              • Release signal published when the joint enters a tolerance window
+                around the target angle (e.g., −45°)<br />
+              • Logging and basic error handling for camera and collision operations :contentReference[oaicite:5]{index=5}
             </p>
           </div>
         </div>
@@ -588,23 +585,34 @@
           <div>
             <div class="tag-label">Control pipeline</div>
             <ul>
-              <li>Define target cup position in world or table frame.</li>
-              <li>Choose a desired release pose and velocity for the end-effector.</li>
-              <li>Use kinematics to compute joint positions over time.</li>
-              <li>Send trajectory to the arm controller with correct timing.</li>
-              <li>Observe outcome and adjust throwing parameters.</li>
+              <li>Human places ball and cup, then starts both ROS&nbsp;2 nodes.</li>
+              <li>Vision node publishes the cup’s yaw angle on <code>camera_start_angle_deg</code>.</li>
+              <li>
+                <code>BeerPongThrow</code> moves to a home pose, picks up the ball,
+                and lifts to a safe height.
+              </li>
+              <li>
+                The base joint (<code>joint_1</code>) is set to the camera-derived yaw
+                angle; <code>joint_3</code> is moved to a −90° backswing, then swung
+                through +90° while monitoring for the release angle. :contentReference[oaicite:6]{index=6}
+              </li>
+              <li>
+                The ball is released mid-swing and the robot returns home while the
+                human operator resets the scene for the next attempt.
+              </li>
             </ul>
           </div>
           <div>
             <div class="tag-label">System diagram (concept)</div>
             <div class="diagram-box">
-              <strong>High-level blocks:</strong>
+              <strong>Flow:</strong><br /><br />
+              Human setup → Start ROS&nbsp;2 nodes → RealSense detects red cup and
+              publishes yaw → BeerPongThrow plans pick & lift → backswing →
+              monitored swing with angle-based release → ball flight to cup →
+              robot returns home, human resets the ball.
               <br /><br />
-              User-defined cup position → Trajectory Planner
-              (release angle, speed, timing) → Inverse Kinematics → Joint Trajectory
-              → Robot Arm → Ball Flight → Cup / Table
-              <br /><br />
-              You can replace this box with your own diagram image later if you prefer.
+              This mirrors the detailed system flow diagram from the project
+              report while staying compact for the portfolio. :contentReference[oaicite:7]{index=7}
             </div>
           </div>
         </div>
@@ -614,21 +622,25 @@
       <section id="perception">
         <div class="section-header">
           <h3>Perception & Cup Detection</h3>
-          <span>Locating the target cup using vision</span>
+          <span>RealSense-based red cup localization</span>
         </div>
 
         <p>
-          To ensure consistent throws, the robot must know where the cup is on the
-          table. I used a camera view of the workspace and performed cup detection,
-          drawing a bounding box around the target and estimating its 3D position
-          (X, Y, Z in meters) relative to the camera frame.
+          A dedicated vision node uses an Intel RealSense RGB-D camera to detect the
+          red cup and compute its yaw angle relative to the camera frame. The color
+          image is converted to HSV, thresholded with two red masks, and the largest
+          contour is used as the cup region. Depth at the contour centroid is
+          combined with camera intrinsics to deproject to 3D and compute a yaw
+          angle using <code>atan2(-X, Z)</code>. This angle is published on the
+          <code>camera_start_angle_deg</code> topic and drives the robot’s base
+          alignment. :contentReference[oaicite:8]{index=8}
         </p>
 
         <div class="two-col" style="margin-top:12px;">
           <div>
             <div class="tag-label">Cup centered in view</div>
             <div class="hero-media-inner" style="border-radius:14px; overflow:hidden;">
-              <img src="images/cup_center.jpg"
+              <img src="images/cup_center.jpeg"
                    alt="Cup detection with cup centered in the workspace"
                    style="width:100%; display:block;" />
             </div>
@@ -636,7 +648,7 @@
           <div>
             <div class="tag-label">Cup shifted to the right</div>
             <div class="hero-media-inner" style="border-radius:14px; overflow:hidden;">
-              <img src="images/cup_right.jpg"
+              <img src="images/cup_right.jpeg"
                    alt="Cup detection with cup on the right side of the table"
                    style="width:100%; display:block;" />
             </div>
@@ -644,9 +656,10 @@
         </div>
 
         <p class="footnote">
-          The green bounding box highlights the detected cup, and the overlay shows
-          the estimated (X, Y, Z) position. These coordinates inform the target pose
-          for the throwing trajectory.
+          The green bounding box highlights the detected cup, and the overlay
+          shows the estimated (X, Y, Z) position and yaw angle. These coordinates
+          provide the starting yaw for the throwing trajectory and help us verify
+          detection quality, as shown in the still image from our report. :contentReference[oaicite:9]{index=9}
         </p>
       </section>
 
@@ -654,46 +667,46 @@
       <section id="technical">
         <div class="section-header">
           <h3>Technical Details</h3>
-          <span>Kinematics, trajectory design, and tuning</span>
+          <span>Throwing trajectory, threading, and tuning</span>
         </div>
 
         <div class="two-col">
           <div>
-            <div class="tag-label">Kinematics & Poses</div>
+            <div class="tag-label">Throwing motion & kinematics</div>
             <p>
-              We used the arm’s kinematic model to compute joint angles that achieve
-              a desired release pose for the end-effector (position and orientation)
-              relative to the table. This ensured the ball started from the correct
-              location and direction before being released.
+              The throwing motion is implemented in <code>throw_ball_forward()</code>:
+              the arm moves to a retract/home configuration, executes a pre-grasp
+              and grasp at the ball start pose, attaches a “ball” collision object
+              in the planning scene, lifts to a safe height, then transitions into a
+              swing from <code>joint_3 = -90°</code> to <code>+90°</code> while
+              keeping the base yaw set by the camera. :contentReference[oaicite:10]{index=10}
             </p>
-            <ul>
-              <li>Defined a pre-throw pose and a release pose in 3D space.</li>
-              <li>
-                Solved inverse kinematics to get joint configurations for these poses.
-              </li>
-              <li>
-                Ensured joint limits and feasible motion between the two states.
-              </li>
-            </ul>
             <p>
-              The throw is modeled as a fast motion between these poses, with timing
-              chosen to create the right end-effector velocity at release.
+              A 100&nbsp;Hz timer monitors the current <code>joint_3</code> angle.
+              When it enters a tolerance window around the chosen release angle
+              (e.g., −45°), the node publishes a <code>RELEASE</code> signal and
+              stops the timer. This angle-based trigger lets the release happen in
+              the middle of a fast, continuous swing instead of at a discrete pose. :contentReference[oaicite:11]{index=11}
             </p>
           </div>
           <div>
-            <div class="tag-label">Throw Parameterization & Tuning</div>
+            <div class="tag-label">Concurrency, challenges & future work</div>
             <p>
-              Instead of analytically solving the full ballistics problem with perfect
-              dynamics, we used a parameterized throw and tuned it experimentally.
+              We use a multi-threaded ROS&nbsp;2 executor and a separate swing
+              thread so that motion execution, joint monitoring, and camera
+              callbacks can run concurrently. Early versions suffered from
+              inconsistent release timing until we restructured the node with
+              proper timers and threading. :contentReference[oaicite:12]{index=12}
             </p>
-            <ul>
-              <li>Launch angle and direction of the end-effector.</li>
-              <li>Speed of the motion (duration of the throw segment).</li>
-              <li>Exact release timing / joint velocity profile.</li>
-            </ul>
             <p>
-              By logging the hit/miss outcomes for different parameter sets, we
-              iteratively improved consistency and accuracy toward a reliable shot.
+              Major challenges included tuning joint velocities and release timing
+              on a manipulator not designed for high-speed ballistic motions,
+              debugging TF frames and topic timing during perception–planning
+              integration, and managing asynchronous events. Future extensions
+              include adding a more accurate aerodynamic model of the ball,
+              predicting landing points before execution, and automatically
+              generating optimized throwing trajectories for arbitrary cup
+              positions. :contentReference[oaicite:13]{index=13}
             </p>
           </div>
         </div>
@@ -703,18 +716,20 @@
       <section id="results">
         <div class="section-header">
           <h3>Experiments & Results</h3>
-          <span>Shot accuracy and observations</span>
+          <span>Shot behavior and qualitative performance</span>
         </div>
 
         <p>
-          We evaluated the performance of the beer pong robot by running repeated
-          trials with fixed cup positions and throwing parameters, then adjusting
-          the parameters to see how accuracy changed.
+          We evaluated our system by running repeated throws toward a fixed cup
+          location while varying parameters such as backswing angle, swing range,
+          and release angle. The RealSense-based yaw estimate allowed the arm to
+          consistently align with the target, and trajectory tuning significantly
+          improved the fraction of shots that landed in or near the cup. :contentReference[oaicite:14]{index=14}
         </p>
 
         <div class="two-col">
           <div>
-            <div class="tag-label">Example experiment</div>
+            <div class="tag-label">Example experiment (fill in your data)</div>
             <table>
               <thead>
                 <tr>
@@ -728,78 +743,47 @@
               <tbody>
                 <!-- TODO: Replace these with your actual numbers -->
                 <tr>
-                  <td>Baseline</td>
+                  <td>Baseline (untuned)</td>
                   <td>1.5 m</td>
                   <td>20</td>
-                  <td>6</td>
-                  <td>30%</td>
+                  <td>—</td>
+                  <td>—</td>
                 </tr>
                 <tr>
                   <td>After tuning</td>
                   <td>1.5 m</td>
                   <td>20</td>
-                  <td>12</td>
-                  <td>60%</td>
+                  <td>—</td>
+                  <td>—</td>
                 </tr>
               </tbody>
             </table>
             <p class="footnote">
-              *Replace the table values with your actual trial counts and hit rates.
-              Sample throws at different release angles (10° and −15°) are shown in the demo video above.
+              The table is a placeholder so we can keep the page concise. You can
+              fill this in with the actual number of trials and successful shots
+              from your experiments.
             </p>
           </div>
           <div>
             <div class="tag-label">Key observations</div>
             <ul>
               <li>
-                Small changes in release timing or angle had a large effect on where
-                the ball landed.
+                Small changes in release angle, joint velocity scaling, or backswing
+                magnitude drastically changed the ball’s landing point.
               </li>
               <li>
-                Once tuned, the robot was much more repeatable than a human throw,
-                but sensitive to small position changes of the cup or table.
+                The modular ROS&nbsp;2 structure (separate nodes for throwing,
+                perception, and gripper logic) made it easier to debug integration
+                issues and iterate on the behavior.
               </li>
               <li>
-                Modeling physics is helpful, but real-world testing is essential to
-                capture friction, compliance, and arm dynamics.
+                Systematic parameter sweeps and controlled experiments were essential
+                for moving from “occasionally lucky” throws to a stable and
+                repeatable demo.
               </li>
             </ul>
           </div>
         </div>
-      </section>
-
-      <!-- ROLE / REFLECTION -->
-      <section id="reflection">
-        <div class="section-header">
-          <h3>My Role & Takeaways</h3>
-          <span>What I contributed and what I learned</span>
-        </div>
-
-        <p>
-          This was a team project. I contributed to the overall system design,
-          helped implement the kinematics and control logic, and worked on tuning
-          the throwing motion and designing the experiments used to evaluate
-          performance.
-        </p>
-        <ul>
-          <li>
-            Gained hands-on intuition for how kinematics and motion planning connect
-            to physical behavior.
-          </li>
-          <li>
-            Experienced the gap between ideal models and real hardware dynamics,
-            especially at high speeds.
-          </li>
-          <li>
-            Practiced designing controlled experiments and using data to improve
-            performance.
-          </li>
-        </ul>
-        <p style="margin-top:6px;">
-          If we had more time, I would extend this work with automatic parameter
-          search (e.g., optimization or reinforcement learning) and add perception
-          so the robot can detect cup positions instead of relying on a fixed setup.
-        </p>
       </section>
 
       <footer>

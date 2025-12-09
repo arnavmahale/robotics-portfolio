@@ -154,7 +154,7 @@
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 4px;
     }
 
     .badge {
@@ -170,48 +170,6 @@
       border-color: rgba(56, 189, 248, 0.7);
       background: var(--accent-soft);
       color: #e0f2fe;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text);
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .btn:hover {
-      background: rgba(15, 23, 42, 1);
-      text-decoration: none;
-    }
-
-    .btn.primary {
-      border-color: rgba(56, 189, 248, 0.8);
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      color: #eff6ff;
-      box-shadow: 0 16px 40px rgba(59, 130, 246, 0.6);
-    }
-
-    .btn.primary:hover {
-      background: linear-gradient(135deg, #38bdf8, #4f46e5);
-    }
-
-    .btn.secondary {
-      background: rgba(15, 23, 42, 0.9);
     }
 
     .hero-media {
@@ -515,9 +473,9 @@
             Robot Arm <span>Playing Beer Pong</span>
           </h2>
           <p>
-            For my final project, I built and programmed a robotic beer pong player:
-            a robot arm that aims, throws, and scores shots into cups using
-            kinematics, motion planning, and empirical trajectory tuning.
+            For our final project, my team and I built and programmed a robotic beer
+            pong player: a robot arm that aims, throws, and scores shots into cups
+            using kinematics, motion planning, and empirical trajectory tuning.
             This page documents the full pipeline from concept to implementation.
           </p>
 
@@ -527,19 +485,12 @@
             <div class="badge">Trajectory Tuning & Calibration</div>
             <div class="badge">Python · (ROS/Simulation if used)</div>
           </div>
-
-          <div class="hero-actions">
-            <a href="#video" class="btn primary">▶ Watch Demo</a>
-            <a href="#design" class="btn secondary">View System Design</a>
-            <!-- TODO: replace '#' with your report or GitHub link -->
-            <a href="#" class="btn secondary">View Code / Report</a>
-          </div>
         </div>
 
         <div class="hero-media" id="video">
           <div class="video-pill">Demo Video</div>
           <div class="hero-media-inner">
-            <video controls style="width: 100%; height: 100%; object-fit: cover;">
+            <video controls style="width: 100%; height: 100%; object-fit: contain;">
               <source src="videos/throw_10deg.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
@@ -564,9 +515,11 @@
               table at a known distance.
             </p>
             <p>
-              I focused on modeling the throwing motion of the end-effector, mapping
-              desired launch velocities to joint trajectories, and iteratively
-              calibrating the throws to improve accuracy.
+              Our team focused on modeling the throwing motion of the end-effector,
+              mapping desired launch velocities to joint trajectories, and
+              iteratively calibrating the throws to improve accuracy. I particularly
+              focused on connecting the kinematics and tuning process to the
+              physical behavior we observed in the lab.
             </p>
             <ul>
               <li>Modeled the arm and end-effector pose for a throwing motion.</li>
@@ -708,7 +661,7 @@
           <div>
             <div class="tag-label">Kinematics & Poses</div>
             <p>
-              I used the arm’s kinematic model to compute joint angles that achieve
+              We used the arm’s kinematic model to compute joint angles that achieve
               a desired release pose for the end-effector (position and orientation)
               relative to the table. This ensured the ball started from the correct
               location and direction before being released.
@@ -731,7 +684,7 @@
             <div class="tag-label">Throw Parameterization & Tuning</div>
             <p>
               Instead of analytically solving the full ballistics problem with perfect
-              dynamics, I used a parameterized throw and tuned it experimentally.
+              dynamics, we used a parameterized throw and tuned it experimentally.
             </p>
             <ul>
               <li>Launch angle and direction of the end-effector.</li>
@@ -739,7 +692,7 @@
               <li>Exact release timing / joint velocity profile.</li>
             </ul>
             <p>
-              By logging the hit/miss outcomes for different parameter sets, I
+              By logging the hit/miss outcomes for different parameter sets, we
               iteratively improved consistency and accuracy toward a reliable shot.
             </p>
           </div>
@@ -754,7 +707,7 @@
         </div>
 
         <p>
-          I evaluated the performance of the beer pong robot by running repeated
+          We evaluated the performance of the beer pong robot by running repeated
           trials with fixed cup positions and throwing parameters, then adjusting
           the parameters to see how accuracy changed.
         </p>
@@ -819,13 +772,14 @@
       <section id="reflection">
         <div class="section-header">
           <h3>My Role & Takeaways</h3>
-          <span>What I built and what I learned</span>
+          <span>What I contributed and what I learned</span>
         </div>
 
         <p>
-          I worked individually on this project and was responsible for the full
-          pipeline: defining the problem, implementing the kinematics and control
-          logic, tuning the throwing motion, and designing the experiments.
+          This was a team project. I contributed to the overall system design,
+          helped implement the kinematics and control logic, and worked on tuning
+          the throwing motion and designing the experiments used to evaluate
+          performance.
         </p>
         <ul>
           <li>
@@ -842,7 +796,7 @@
           </li>
         </ul>
         <p style="margin-top:6px;">
-          If I had more time, I would extend this work with automatic parameter
+          If we had more time, I would extend this work with automatic parameter
           search (e.g., optimization or reinforcement learning) and add perception
           so the robot can detect cup positions instead of relying on a fixed setup.
         </p>

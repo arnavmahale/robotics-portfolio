@@ -510,12 +510,11 @@
         <div class="two-col">
           <div>
             <p>
-              The robot’s job is to autonomously perform a full beer-pong throw:
-              pick up a ball from a designated pickup spot, lift to a safe height,
-              rotate toward the detected cup, and execute a dynamic swing that
-              releases the ball in mid-air toward the target. The cup is kept at a
-              fixed position on a “beer pong” table, while the robot operates on a
-              separate table with a known ball start pose. :contentReference[oaicite:0]{index=0}
+              The robot’s job is to autonomously perform a full beer-pong throw: pick up a
+              ball from a designated pickup spot, lift to a safe height, rotate toward the
+              detected cup, and execute a dynamic swing that releases the ball in mid-air
+              toward the target. The cup is kept at a fixed position on a “beer pong” table,
+              while the robot operates on a separate table with a known ball start pose.
             </p>
             <p>
               Our ROS&nbsp;2 package implements a <code>BeerPongThrow</code> node that
@@ -524,7 +523,7 @@
               <code>RedCupAnglePublisher</code> node uses an Intel RealSense camera to
               detect the red cup and compute its yaw angle; this angle is fed into
               the throwing node so the robot can align its base joint before the
-              swing. :contentReference[oaicite:1]{index=1}
+              swing.
             </p>
           </div>
           <div>
@@ -536,7 +535,7 @@
               <li>
                 Human operator starts ROS&nbsp;2 nodes, supervises throws, and resets
                 the ball and cups between trials while staying outside the robot’s
-                workspace for safety. :contentReference[oaicite:2]{index=2}
+                workspace for safety.
               </li>
             </ul>
           </div>
@@ -557,16 +556,17 @@
               • Kinova Gen3 Lite 6-DOF manipulator<br />
               • Kinova 2F gripper for grasping the ball<br />
               • Intel RealSense RGB-D camera overlooking both tables<br />
-              • Fixed tables with marked ball pickup and cup locations :contentReference[oaicite:3]{index=3}
+              • Fixed tables with marked ball pickup and cup locations
             </p>
           </div>
           <div class="card">
             <h4>Software & Nodes</h4>
             <p>
-              • ROS&nbsp;2 nodes <code>BeerPongThrow</code> and <code>RedCupAnglePublisher</code><br />
-              • MoveIt&nbsp;2 motion planning with Kinova URDF/SRDF<br />
+              • ROS&nbsp;2 nodes <code>BeerPongThrow</code> and
+              <code>RedCupAnglePublisher</code><br />
+              • MoveIt&nbsp;2 motion planning with Kinova<br />
               • Planning scene with the ball as an attachable collision object<br />
-              • Multi-threaded ROS&nbsp;2 executor for concurrent motion and sensing :contentReference[oaicite:4]{index=4}
+              • Multi-threaded ROS&nbsp;2 executor for concurrent motion and sensing
             </p>
           </div>
           <div class="card">
@@ -576,7 +576,7 @@
               • Angle-based release monitor on <code>joint_3</code> at 100&nbsp;Hz<br />
               • Release signal published when the joint enters a tolerance window
                 around the target angle (e.g., −45°)<br />
-              • Logging and basic error handling for camera and collision operations :contentReference[oaicite:5]{index=5}
+              • Logging and basic error handling for camera and collision operations
             </p>
           </div>
         </div>
@@ -594,7 +594,7 @@
               <li>
                 The base joint (<code>joint_1</code>) is set to the camera-derived yaw
                 angle; <code>joint_3</code> is moved to a −90° backswing, then swung
-                through +90° while monitoring for the release angle. :contentReference[oaicite:6]{index=6}
+                through +90° while monitoring for the release angle.
               </li>
               <li>
                 The ball is released mid-swing and the robot returns home while the
@@ -607,12 +607,11 @@
             <div class="diagram-box">
               <strong>Flow:</strong><br /><br />
               Human setup → Start ROS&nbsp;2 nodes → RealSense detects red cup and
-              publishes yaw → BeerPongThrow plans pick & lift → backswing →
+              publishes yaw → BeerPongThrow plans pick &amp; lift → backswing →
               monitored swing with angle-based release → ball flight to cup →
-              robot returns home, human resets the ball.
-              <br /><br />
+              robot returns home, human resets the ball.<br /><br />
               This mirrors the detailed system flow diagram from the project
-              report while staying compact for the portfolio. :contentReference[oaicite:7]{index=7}
+              report while staying compact for the portfolio.
             </div>
           </div>
         </div>
@@ -633,7 +632,7 @@
           combined with camera intrinsics to deproject to 3D and compute a yaw
           angle using <code>atan2(-X, Z)</code>. This angle is published on the
           <code>camera_start_angle_deg</code> topic and drives the robot’s base
-          alignment. :contentReference[oaicite:8]{index=8}
+          alignment.
         </p>
 
         <div class="two-col" style="margin-top:12px;">
@@ -658,8 +657,8 @@
         <p class="footnote">
           The green bounding box highlights the detected cup, and the overlay
           shows the estimated (X, Y, Z) position and yaw angle. These coordinates
-          provide the starting yaw for the throwing trajectory and help us verify
-          detection quality, as shown in the still image from our report. :contentReference[oaicite:9]{index=9}
+          provide the starting yaw for the throwing trajectory and help verify
+          detection quality.
         </p>
       </section>
 
@@ -679,14 +678,14 @@
               and grasp at the ball start pose, attaches a “ball” collision object
               in the planning scene, lifts to a safe height, then transitions into a
               swing from <code>joint_3 = -90°</code> to <code>+90°</code> while
-              keeping the base yaw set by the camera. :contentReference[oaicite:10]{index=10}
+              keeping the base yaw set by the camera.
             </p>
             <p>
               A 100&nbsp;Hz timer monitors the current <code>joint_3</code> angle.
               When it enters a tolerance window around the chosen release angle
               (e.g., −45°), the node publishes a <code>RELEASE</code> signal and
               stops the timer. This angle-based trigger lets the release happen in
-              the middle of a fast, continuous swing instead of at a discrete pose. :contentReference[oaicite:11]{index=11}
+              the middle of a fast, continuous swing instead of at a discrete pose.
             </p>
           </div>
           <div>
@@ -696,7 +695,7 @@
               thread so that motion execution, joint monitoring, and camera
               callbacks can run concurrently. Early versions suffered from
               inconsistent release timing until we restructured the node with
-              proper timers and threading. :contentReference[oaicite:12]{index=12}
+              proper timers and threading.
             </p>
             <p>
               Major challenges included tuning joint velocities and release timing
@@ -706,7 +705,7 @@
               include adding a more accurate aerodynamic model of the ball,
               predicting landing points before execution, and automatically
               generating optimized throwing trajectories for arbitrary cup
-              positions. :contentReference[oaicite:13]{index=13}
+              positions.
             </p>
           </div>
         </div>
@@ -724,7 +723,7 @@
           location while varying parameters such as backswing angle, swing range,
           and release angle. The RealSense-based yaw estimate allowed the arm to
           consistently align with the target, and trajectory tuning significantly
-          improved the fraction of shots that landed in or near the cup. :contentReference[oaicite:14]{index=14}
+          improved the fraction of shots that landed in or near the cup.
         </p>
 
         <div class="two-col">

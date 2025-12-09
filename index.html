@@ -110,7 +110,7 @@
     }
 
     nav a.primary:hover {
-      background: radial-gradient(circle at top left, #38bdf8, #0284c7);
+      background: radial-gradient(circle at top left, #38bdf8, #028c7c);
     }
 
     main {
@@ -500,6 +500,7 @@
       <nav>
         <a href="#overview">Overview</a>
         <a href="#design">System Design</a>
+        <a href="#perception">Perception</a>
         <a href="#results">Results</a>
         <a href="#video" class="primary">Demo</a>
       </nav>
@@ -536,18 +537,12 @@
         </div>
 
         <div class="hero-media" id="video">
-          <div class="video-pill">Demo Video Placeholder</div>
+          <div class="video-pill">Demo Video</div>
           <div class="hero-media-inner">
-            <!-- TODO: Replace this with an embedded <video> or <img> frame if you like -->
-            <p>
-              Embed your demo here. For example:
-              <br /><br />
-              – A screenshot/GIF of the robot throwing the ball<br />
-              – Or a link/thumbnail to your YouTube demo.
-              <br /><br />
-              Replace this placeholder with an
-              <code>&lt;img&gt;</code> or <code>&lt;video&gt;</code> tag.
-            </p>
+            <video controls style="width: 100%; height: 100%; object-fit: cover;">
+              <source src="videos/throw_10deg.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
           <div class="corner-tag">Final Project</div>
         </div>
@@ -662,6 +657,46 @@
         </div>
       </section>
 
+      <!-- PERCEPTION / CUP DETECTION -->
+      <section id="perception">
+        <div class="section-header">
+          <h3>Perception & Cup Detection</h3>
+          <span>Locating the target cup using vision</span>
+        </div>
+
+        <p>
+          To ensure consistent throws, the robot must know where the cup is on the
+          table. I used a camera view of the workspace and performed cup detection,
+          drawing a bounding box around the target and estimating its 3D position
+          (X, Y, Z in meters) relative to the camera frame.
+        </p>
+
+        <div class="two-col" style="margin-top:12px;">
+          <div>
+            <div class="tag-label">Cup centered in view</div>
+            <div class="hero-media-inner" style="border-radius:14px; overflow:hidden;">
+              <img src="images/cup_center.jpg"
+                   alt="Cup detection with cup centered in the workspace"
+                   style="width:100%; display:block;" />
+            </div>
+          </div>
+          <div>
+            <div class="tag-label">Cup shifted to the right</div>
+            <div class="hero-media-inner" style="border-radius:14px; overflow:hidden;">
+              <img src="images/cup_right.jpg"
+                   alt="Cup detection with cup on the right side of the table"
+                   style="width:100%; display:block;" />
+            </div>
+          </div>
+        </div>
+
+        <p class="footnote">
+          The green bounding box highlights the detected cup, and the overlay shows
+          the estimated (X, Y, Z) position. These coordinates inform the target pose
+          for the throwing trajectory.
+        </p>
+      </section>
+
       <!-- TECHNICAL DETAILS -->
       <section id="technical">
         <div class="section-header">
@@ -757,6 +792,7 @@
             </table>
             <p class="footnote">
               *Replace the table values with your actual trial counts and hit rates.
+              Sample throws at different release angles (10° and −15°) are shown in the demo video above.
             </p>
           </div>
           <div>
